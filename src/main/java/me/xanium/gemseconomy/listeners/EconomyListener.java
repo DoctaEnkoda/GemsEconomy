@@ -10,9 +10,13 @@ package me.xanium.gemseconomy.listeners;
 
 import me.xanium.gemseconomy.GemsEconomy;
 import me.xanium.gemseconomy.account.Account;
+import me.xanium.gemseconomy.currency.Currency;
+import me.xanium.gemseconomy.event.RedisPubAPI;
 import me.xanium.gemseconomy.file.F;
 import me.xanium.gemseconomy.utils.SchedulerUtils;
 import me.xanium.gemseconomy.utils.UtilServer;
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -20,6 +24,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+
+import java.util.UUID;
 
 public class EconomyListener implements Listener {
 
@@ -66,5 +72,32 @@ public class EconomyListener implements Listener {
         });
     }
 
+    @EventHandler(priority = EventPriority.LOW)
+    public void onRedisApi(final RedisPubAPI api) {
+        String value = api.getValueRedis();
+        String[] redisSplit = value.split(":");
+        String uuid = redisSplit[1];
+        String amount = redisSplit[2];
+        String uuidCurrency = redisSplit[3];
+        String singularCurrency = redisSplit[4];
+        String pluralCurrency = redisSplit[5];
+
+        Currency currency = new Currency(UUID.fromString(uuidCurrency), singularCurrency, pluralCurrency);
+
+        OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(UUID.fromString(uuid));
+
+        SchedulerUtils.runAsync(()->{
+            Account acc = plugin.getAccountManager().getAccount(offlinePlayer.getUniqueId());
+            if(acc == null) {
+                return; // Pas besoin de le remettre dans le cache
+            }
+            if(!acc.getNickname().equals(offlinePlayer.getName())) {
+                acc.setNickname(offlinePlayer.getName());
+            }
+            acc.modifyBalance(currency, Double.parseDouble(amount), false);
+            UtilServer.consoleLog("Account name changes detected, updating: " + offlinePlayer.getName());
+            plugin.getDataStore().saveAccount(acc);
+        });
+    }
 }
 

@@ -14,6 +14,7 @@ import me.xanium.gemseconomy.currency.Currency;
 import me.xanium.gemseconomy.event.GemsPayEvent;
 import me.xanium.gemseconomy.file.F;
 import me.xanium.gemseconomy.utils.SchedulerUtils;
+import me.xanium.gemseconomy.utils.TranactionType;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -91,10 +92,17 @@ public class PayCommand implements CommandExecutor {
                                     SchedulerUtils.run(() -> Bukkit.getPluginManager().callEvent(event));
                                     if (event.isCancelled()) return;
 
+
                                     double accBal = account.getBalance(currency) - amount;
                                     double tarBal = target.getBalance(currency) + amount;
+
                                     account.modifyBalance(currency, accBal, true);
+                                    GemsEconomy.getInstance().getRedisImplementation().publishRedis(event.getEventName() + ":"
+                                            + account.getUuid() + ":" + accBal + ":" + currency.getUuid() + ":" + currency.getSingular() + ":" + currency.getPlural());
+
                                     target.modifyBalance(currency, tarBal, true);
+                                    GemsEconomy.getInstance().getRedisImplementation().publishRedis(event.getEventName() + ":"
+                                            + target.getUuid() + ":" + tarBal + currency.getUuid() + ":" + currency.getSingular() + ":" + currency.getPlural());
                                     GemsEconomy.getInstance().getEconomyLogger().log("[PAYMENT] " + account.getDisplayName() + " (New bal: " + currency.format(accBal) + ") -> paid " + target.getDisplayName() + " (New bal: " + currency.format(tarBal) + ") - An amount of " + currency.format(amount));
 
                                     if (Bukkit.getPlayer(target.getUuid()) != null) {

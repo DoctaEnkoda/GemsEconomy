@@ -51,6 +51,14 @@ public class Configuration {
         config.addDefault("mysql.username", "root");
         config.addDefault("mysql.password", "password");
 
+        config.addDefault("redis.hostname", "127.0.0.1");
+        config.addDefault("redis.port", 6379);
+        config.addDefault("redis.password", "");
+        config.addDefault("redis.maxPool", 3);
+        config.addDefault("redis.useSSL", false);
+        config.addDefault("redis.timeOut", 500);
+        config.addDefault("redis.channel", "gems_excalia");
+
       //  config.addDefault("sqlite.file", "database.sqlite");
 
         config.addDefault("cheque.material", Material.PAPER.toString());

@@ -42,6 +42,8 @@ public class Account {
 
             double finalAmount = getBalance(currency) - amount;
             this.modifyBalance(currency, finalAmount, true);
+            GemsEconomy.getInstance().getRedisImplementation().publishRedis(event.getEventName() + ":"
+            + uuid + ":"  + finalAmount + ":" + currency.getUuid() + ":" + currency.getSingular() + ":" + currency.getPlural());
             GemsEconomy.getInstance().getEconomyLogger().log("[WITHDRAW] Account: " + getDisplayName() + " were withdrawn: " + currency.format(amount) + " and now has " + currency.format(finalAmount));
             return true;
         }
@@ -57,6 +59,9 @@ public class Account {
 
             double finalAmount = getBalance(currency) + amount;
             this.modifyBalance(currency, finalAmount, true);
+
+            GemsEconomy.getInstance().getRedisImplementation().publishRedis(event.getEventName() + ":"
+                    + uuid + ":" + finalAmount + ":" + currency.getUuid() + ":" + currency.getSingular() + ":" + currency.getPlural());
             GemsEconomy.getInstance().getEconomyLogger().log("[DEPOSIT] Account: " + getDisplayName() + " were deposited: " + currency.format(amount) + " and now has " + currency.format(finalAmount));
             return true;
         }
@@ -138,6 +143,8 @@ public class Account {
         if(event.isCancelled())return;
 
         getBalances().put(currency, amount);
+        GemsEconomy.getInstance().getRedisImplementation().publishRedis(event.getEventName() + ":"
+                + uuid + ":" + amount + ":" + currency.getUuid() + ":" + currency.getSingular() + ":" + currency.getPlural());
         GemsEconomy.getInstance().getEconomyLogger().log("[BALANCE SET] Account: " + getDisplayName() + " were set to: " + currency.format(amount));
         GemsEconomy.getInstance().getDataStore().saveAccount(this);
     }
@@ -152,7 +159,12 @@ public class Account {
      * @param save - Save the account or not. Should be done async!
      */
     public void modifyBalance(Currency currency, double amount, boolean save){
-        getBalances().put(currency, amount);
+        getBalances().forEach((currency1, aDouble) -> {
+            if (currency1.getUuid().equals(currency.getUuid())) {
+                getBalances().put(currency1, amount);
+            }
+        });
+
         if(save){
             GemsEconomy.getInstance().getDataStore().saveAccount(this);
         }

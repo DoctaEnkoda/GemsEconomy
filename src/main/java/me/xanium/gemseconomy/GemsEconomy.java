@@ -15,6 +15,7 @@ import me.xanium.gemseconomy.commands.*;
 import me.xanium.gemseconomy.currency.CurrencyManager;
 import me.xanium.gemseconomy.data.DataStorage;
 import me.xanium.gemseconomy.data.MySQLStorage;
+import me.xanium.gemseconomy.data.RedisImplementation;
 import me.xanium.gemseconomy.data.YamlStorage;
 import me.xanium.gemseconomy.file.Configuration;
 import me.xanium.gemseconomy.listeners.EconomyListener;
@@ -41,6 +42,8 @@ public class GemsEconomy extends JavaPlugin {
     private Metrics metrics;
     private EconomyLogger economyLogger;
     private UpdateForwarder updateForwarder;
+
+    private RedisImplementation redisImplementation;
 
     private boolean debug = false;
     private boolean vault = false;
@@ -125,6 +128,8 @@ public class GemsEconomy extends JavaPlugin {
             chequeManager = new ChequeManager(this);
         }
 
+        redisImplementation = new RedisImplementation(this);
+
         SchedulerUtils.runAsync(this::checkForUpdate);
     }
 
@@ -136,6 +141,10 @@ public class GemsEconomy extends JavaPlugin {
 
         if (getDataStore() != null) {
             getDataStore().close();
+        }
+
+        if (redisImplementation != null) {
+            redisImplementation.onClose();
         }
     }
 
@@ -262,5 +271,9 @@ public class GemsEconomy extends JavaPlugin {
 
     public void setCheques(boolean cheques) {
         this.cheques = cheques;
+    }
+
+    public RedisImplementation getRedisImplementation() {
+        return redisImplementation;
     }
 }
