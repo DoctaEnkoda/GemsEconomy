@@ -102,7 +102,7 @@ public class PayCommand implements CommandExecutor {
 
                                     target.modifyBalance(currency, tarBal, true);
                                     GemsEconomy.getInstance().getRedisImplementation().publishRedis(event.getEventName() + ":"
-                                            + target.getUuid() + ":" + tarBal + currency.getUuid() + ":" + currency.getSingular() + ":" + currency.getPlural());
+                                            + target.getUuid() + ":" + tarBal + ":" + currency.getUuid() + ":" + currency.getSingular() + ":" + currency.getPlural());
                                     GemsEconomy.getInstance().getEconomyLogger().log("[PAYMENT] " + account.getDisplayName() + " (New bal: " + currency.format(accBal) + ") -> paid " + target.getDisplayName() + " (New bal: " + currency.format(tarBal) + ") - An amount of " + currency.format(amount));
 
                                     if (Bukkit.getPlayer(target.getUuid()) != null) {
