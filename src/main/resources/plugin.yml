@@ -10,31 +10,31 @@ loadbefore:
   - ItemFrameShops
 softdepend: [Vault, NBTAPI]
 commands:
-  balance:
+  gbalance:
     description: Shows your balances
-    usage: /balance (account)
-    aliases: [gbal, gmoney, bal, money]
-  baltop:
+    usage: /gbalance (account)
+    aliases: [gbal, gmoney]
+  gbaltop:
     description: Shows the top balances of the server
-    usage: /baltop (currency) (page)
-    aliases: [gmoneytop, gecotop, gtop, gbaltop]
-  currency:
+    usage: /gbaltop (currency) (page)
+    aliases: [gmoneytop, gecotop, gtop]
+  gcurrency:
     description: Manage the currencies.
-    usage: /currency
-    aliases: [gcurr, gemscurrencies, gcurrency, currencies]
-  economy:
+    usage: /gcurrency
+    aliases: [gcurr, gemscurrencies, gcurrencies]
+  geconomy:
     description: Give, set or take currency.
-    usage: /eco <set|take|give> <account> <amount> (currency)
-    aliases: [geconomy, eco, geco, gemseconomy]
-  pay:
+    usage: /geco <set|take|give> <account> <amount> (currency)
+    aliases: [geconomy, geco, gemseconomy]
+  gpay:
     description: Pays another account
-    usage: /pay <account> <amount> (currency)
+    usage: /gpay <account> <amount> (currency)
     aliases: [gpay, gemspay]
-  cheque:
-    usage: /cheque
+  gcheque:
+    usage: /gcheque
     description: Write or Redeem a cheque.
     aliases: [note, banknote]
-  exchange:
-    usage: /exchange
+  gexchange:
+    usage: /gexchange
     description: Exchange currencies.
-    aliases: [gex, gemsexchange, gexchange]
+    aliases: [gex, gemsexchange]
