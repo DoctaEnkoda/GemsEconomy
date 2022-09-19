@@ -95,7 +95,7 @@ public class EconomyListener implements Listener {
                 acc.setNickname(offlinePlayer.getName());
             }
             acc.modifyBalance(currency, Double.parseDouble(amount), false);
-            UtilServer.consoleLog("Account name changes detected, updating: " + offlinePlayer.getName());
+
             plugin.getDataStore().saveAccount(acc);
         });
     }

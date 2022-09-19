@@ -20,6 +20,9 @@
  */
 package me.xanium.gemseconomy.commands;
 
+import com.earth2me.essentials.Essentials;
+import com.earth2me.essentials.User;
+import com.earth2me.essentials.api.UserDoesNotExistException;
 import me.xanium.gemseconomy.GemsEconomy;
 import me.xanium.gemseconomy.account.Account;
 import me.xanium.gemseconomy.currency.Currency;
@@ -37,6 +40,8 @@ import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Set;
+import java.util.UUID;
 
 public class CurrencyCommand implements CommandExecutor {
 
@@ -54,25 +59,28 @@ public class CurrencyCommand implements CommandExecutor {
             } else {
                 String cmd = args[0];
                 if (cmd.equalsIgnoreCase("create")) {
-                    if (args.length == 3) {
+                    if (args.length == 4) {
                         String single = args[1];
                         String plural = args[2];
+                        String server = args[3];
                         if (plugin.getCurrencyManager().currencyExist(single) || plugin.getCurrencyManager().currencyExist(plural)) {
                             sender.sendMessage(F.getPrefix() + "§cCurrency already exists.");
                             return;
                         }
 
-                        plugin.getCurrencyManager().createNewCurrency(single, plural);
+                        plugin.getCurrencyManager().createNewCurrency(single, plural, server);
                         sender.sendMessage(F.getPrefix() + "§7Created currency: §a" + single);
                     } else {
                         sender.sendMessage(F.getCurrencyUsage_Create());
                     }
-                } else if (cmd.equalsIgnoreCase("list")) {
+                }
+                else if (cmd.equalsIgnoreCase("list")) {
                     sender.sendMessage(F.getPrefix() + "§7There are §f" + plugin.getCurrencyManager().getCurrencies().size() + "§7 currencies.");
                     for (Currency currency : plugin.getCurrencyManager().getCurrencies()) {
                         sender.sendMessage("§a§l>> §e" + currency.getSingular());
                     }
-                } else if (cmd.equalsIgnoreCase("view")) {
+                }
+                else if (cmd.equalsIgnoreCase("view")) {
                     if (args.length == 2) {
                         Currency currency = plugin.getCurrencyManager().getCurrency(args[1]);
                         if (currency != null) {
@@ -90,7 +98,8 @@ public class CurrencyCommand implements CommandExecutor {
                     } else {
                         sender.sendMessage(F.getCurrencyUsage_View());
                     }
-                } else if (cmd.equalsIgnoreCase("startbal")) {
+                }
+                else if (cmd.equalsIgnoreCase("startbal")) {
                     if (args.length == 3) {
                         Currency currency = plugin.getCurrencyManager().getCurrency(args[1]);
                         if (currency != null) {
@@ -128,7 +137,8 @@ public class CurrencyCommand implements CommandExecutor {
                     } else {
                         sender.sendMessage(F.getCurrencyUsage_Startbal());
                     }
-                } else if (cmd.equalsIgnoreCase("color")) {
+                }
+                else if (cmd.equalsIgnoreCase("color")) {
                     if (args.length == 3) {
                         Currency currency = plugin.getCurrencyManager().getCurrency(args[1]);
                         if (currency != null) {
@@ -149,7 +159,8 @@ public class CurrencyCommand implements CommandExecutor {
                     } else {
                         sender.sendMessage(F.getCurrencyUsage_Color());
                     }
-                } else if (cmd.equalsIgnoreCase("colorlist")) {
+                }
+                else if (cmd.equalsIgnoreCase("colorlist")) {
                     sender.sendMessage("§0§lBLACK §7= black");
                     sender.sendMessage("§1§lDARK BLUE §7= dark_blue");
                     sender.sendMessage("§2§lDARK GREEN §7= dark_green");
@@ -166,7 +177,8 @@ public class CurrencyCommand implements CommandExecutor {
                     sender.sendMessage("§d§lLIGHT PURPLE §7= light_purple");
                     sender.sendMessage("§e§lYELLOW §7= yellow");
                     sender.sendMessage("§f§lWHITE §7= white|reset");
-                } else if (cmd.equalsIgnoreCase("symbol")) {
+                }
+                else if (cmd.equalsIgnoreCase("symbol")) {
                     if (args.length == 3) {
                         Currency currency = plugin.getCurrencyManager().getCurrency(args[1]);
                         if (currency != null) {
@@ -188,7 +200,8 @@ public class CurrencyCommand implements CommandExecutor {
                     } else {
                         sender.sendMessage(F.getCurrencyUsage_Symbol());
                     }
-                } else if (cmd.equalsIgnoreCase("default")) {
+                }
+                else if (cmd.equalsIgnoreCase("default")) {
                     if (args.length == 2) {
                         Currency currency = plugin.getCurrencyManager().getCurrency(args[1]);
                         if (currency != null) {
@@ -206,7 +219,8 @@ public class CurrencyCommand implements CommandExecutor {
                     } else {
                         sender.sendMessage(F.getCurrencyUsage_Default());
                     }
-                } else if (cmd.equalsIgnoreCase("payable")) {
+                }
+                else if (cmd.equalsIgnoreCase("payable")) {
                     if (args.length == 2) {
                         Currency currency = plugin.getCurrencyManager().getCurrency(args[1]);
                         if (currency != null) {
@@ -219,7 +233,8 @@ public class CurrencyCommand implements CommandExecutor {
                     } else {
                         sender.sendMessage(F.getCurrencyUsage_Payable());
                     }
-                } else if (cmd.equalsIgnoreCase("decimals")) {
+                }
+                else if (cmd.equalsIgnoreCase("decimals")) {
                     if (args.length == 2) {
                         Currency currency = plugin.getCurrencyManager().getCurrency(args[1]);
                         if (currency != null) {
@@ -232,7 +247,8 @@ public class CurrencyCommand implements CommandExecutor {
                     } else {
                         sender.sendMessage(F.getCurrencyUsage_Decimals());
                     }
-                } else if (cmd.equalsIgnoreCase("delete")) {
+                }
+                else if (cmd.equalsIgnoreCase("delete")) {
                     if (args.length == 2) {
                         Currency currency = plugin.getCurrencyManager().getCurrency(args[1]);
                         if (currency != null) {
@@ -246,7 +262,8 @@ public class CurrencyCommand implements CommandExecutor {
                     } else {
                         sender.sendMessage(F.getCurrencyUsage_Delete());
                     }
-                } else if (cmd.equalsIgnoreCase("setrate")) {
+                }
+                else if (cmd.equalsIgnoreCase("setrate")) {
                     if (args.length == 3) {
                         Currency currency = plugin.getCurrencyManager().getCurrency(args[1]);
                         if (currency != null) {
@@ -270,7 +287,8 @@ public class CurrencyCommand implements CommandExecutor {
                     } else {
                         sender.sendMessage(F.getCurrencyUsage_Rate());
                     }
-                } else if (cmd.equalsIgnoreCase("convert")) {
+                }
+                else if (cmd.equalsIgnoreCase("convert")) {
                     if (args.length == 2) {
                         String method = args[1];
                         DataStorage current = plugin.getDataStore();
@@ -387,7 +405,8 @@ public class CurrencyCommand implements CommandExecutor {
                     } else {
                         sender.sendMessage(F.getCurrencyUsage_Convert());
                     }
-                } else if (cmd.equalsIgnoreCase("backend")) {
+                }
+                else if (cmd.equalsIgnoreCase("backend")) {
                     if (args.length == 2) {
                         String method = args[1];
                         DataStorage current = plugin.getDataStore();
@@ -436,7 +455,38 @@ public class CurrencyCommand implements CommandExecutor {
                     } else {
                         sender.sendMessage(F.getCurrencyUsage_Backend());
                     }
-                } else {
+                }
+                else if (cmd.equalsIgnoreCase("transfer")) {
+                    if (!sender.hasPermission("excaliamc.gemseconomy.transfer")) return;
+                    if (args.length != 2) return;
+                    String nameEco = args[1];
+                    Essentials essentials = (Essentials) Bukkit.getPluginManager().getPlugin("Essentials");
+                    if (essentials == null) {
+                        sender.sendMessage("essentials error");
+                        return;
+                    }
+
+                    Set<UUID> alluser = essentials.getUserMap().getAllUniqueUsers();
+                    System.out.println(alluser.size() + " vont être converti");
+                    SchedulerUtils.runAsync(()-> {
+                        for (UUID uuid : alluser) {
+                            User user = essentials.getUser(uuid);
+                            Account acc = plugin.getAccountManager().getAccount(user.getUUID());
+                            if(acc == null) {
+                                plugin.getAccountManager().createAccount(user.getName());
+                            }
+                            acc = plugin.getAccountManager().getAccount(user.getUUID());
+                            if(!acc.getNickname().equals(user.getName())) {
+                                acc.setNickname(user.getName());
+                            }
+                            plugin.getDataStore().saveAccount(acc);
+                            Currency currency = plugin.getCurrencyManager().getCurrency(nameEco);
+                            acc.modifyBalance(currency, user.getMoney().doubleValue(), true);
+                            System.out.println("Le compte " + user.getName() + " a été mis à jour dans la nouvelle db");
+                        }
+                    });
+                }
+                else {
                     sender.sendMessage(F.getUnknownSubCommand());
                 }
             }

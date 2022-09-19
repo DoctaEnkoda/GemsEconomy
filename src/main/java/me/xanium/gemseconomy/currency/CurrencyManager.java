@@ -50,13 +50,14 @@ public class CurrencyManager {
         return null;
     }
 
-    public void createNewCurrency(String singular, String plural){
+    public void createNewCurrency(String singular, String plural, String server){
         if(currencyExist(singular) || currencyExist(plural)) {
             return;
         }
 
         Currency currency = new Currency(UUID.randomUUID(), singular, plural);
         currency.setExchangeRate(1.0);
+        currency.setServers(server);
         if(currencies.size() == 0) {
             currency.setDefaultCurrency(true);
         }

@@ -33,7 +33,7 @@ public class MySQLStorage extends DataStorage {
     private String accountsTable = getTablePrefix() + "_accounts";
 
     private final String SAVE_ACCOUNT = "INSERT INTO `" + getTablePrefix() + "_accounts` (`nickname`, `uuid`, `payable`, `balance_data`) VALUES(?, ?, ?, ?) ON DUPLICATE KEY UPDATE `nickname` = VALUES(`nickname`), `uuid` = VALUES(`uuid`), `payable` = VALUES(`payable`), `balance_data` = VALUES(`balance_data`)";
-    private final String SAVE_CURRENCY = "INSERT INTO `" + getTablePrefix() + "_currencies` (`uuid`, `name_singular`, `name_plural`, `default_balance`, `symbol`, `decimals_supported`, `is_default`, `payable`, `color`, `exchange_rate`) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE `uuid` = VALUES(`uuid`), `name_singular` = VALUES(`name_singular`), `name_plural` = VALUES(`name_plural`), `default_balance` = VALUES(`default_balance`), `symbol` = VALUES(`symbol`), `decimals_supported` = VALUES(`decimals_supported`), `is_default` = VALUES(`is_default`), `payable` = VALUES(`payable`), `color` = VALUES(`color`), `exchange_rate` = VALUES(`exchange_rate`)";
+    private final String SAVE_CURRENCY = "INSERT INTO `" + getTablePrefix() + "_currencies` (`uuid`, `name_singular`, `name_plural`, `default_balance`, `symbol`, `decimals_supported`, `is_default`, `payable`, `color`, `exchange_rate`, `servers`) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE `uuid` = VALUES(`uuid`), `name_singular` = VALUES(`name_singular`), `name_plural` = VALUES(`name_plural`), `default_balance` = VALUES(`default_balance`), `symbol` = VALUES(`symbol`), `decimals_supported` = VALUES(`decimals_supported`), `is_default` = VALUES(`is_default`), `payable` = VALUES(`payable`), `color` = VALUES(`color`), `exchange_rate` = VALUES(`exchange_rate`)";
 
     /**
      * Do not use.
@@ -63,7 +63,7 @@ public class MySQLStorage extends DataStorage {
     }
 
     private void setupTables(Connection connection) throws SQLException {
-        try (PreparedStatement ps = connection.prepareStatement("CREATE TABLE IF NOT EXISTS " + this.currencyTable + " (uuid VARCHAR(255) NOT NULL PRIMARY KEY, name_singular VARCHAR(255), name_plural VARCHAR(255),    default_balance DECIMAL,    symbol VARCHAR(10),    decimals_supported INT,    is_default INT,    payable INT,    color VARCHAR(255),    exchange_rate DECIMAL);")) {
+        try (PreparedStatement ps = connection.prepareStatement("CREATE TABLE IF NOT EXISTS " + this.currencyTable + " (uuid VARCHAR(255) NOT NULL PRIMARY KEY, name_singular VARCHAR(255), name_plural VARCHAR(255),    default_balance DECIMAL,    symbol VARCHAR(10),    decimals_supported INT,    is_default INT,    payable INT,    color VARCHAR(255),    exchange_rate DECIMAL, servers VARCHAR(255));")) {
             ps.execute();
         }
         try (PreparedStatement ps = connection.prepareStatement("CREATE TABLE IF NOT EXISTS " + this.accountsTable + " (nickname VARCHAR(255), uuid VARCHAR(255) NOT NULL PRIMARY KEY, payable INT, balance_data LONGTEXT NULL);")) {
@@ -164,6 +164,7 @@ public class MySQLStorage extends DataStorage {
                 UUID uuid = UUID.fromString(set.getString("uuid"));
                 String singular = set.getString("name_singular");
                 String plural = set.getString("name_plural");
+                String server = set.getString("servers");
                 double defaultBalance = set.getDouble("default_balance");
                 String symbol = set.getString("symbol");
                 boolean decimals = set.getInt("decimals_supported") == 1;
@@ -175,7 +176,12 @@ public class MySQLStorage extends DataStorage {
                 currency.setDefaultBalance(defaultBalance);
                 currency.setSymbol(symbol);
                 currency.setDecimalSupported(decimals);
-                currency.setDefaultCurrency(isDefault);
+                if (isDefault) {
+                    currency.setDefaultCurrency(GemsEconomy.getInstance().getConfig().getString("servers", "minecraft").equalsIgnoreCase(server));
+                } else {
+                    currency.setDefaultCurrency(false);
+                }
+                currency.setServers(server);
                 currency.setPayable(payable);
                 currency.setColor(color);
                 currency.setExchangeRate(exchangeRate);
@@ -231,6 +237,7 @@ public class MySQLStorage extends DataStorage {
             stmt.setInt(8, currency.isPayable() ? 1 : 0);
             stmt.setString(9, currency.getColor().name());
             stmt.setDouble(10, currency.getExchangeRate());
+            stmt.setString(11, currency.getServers());
 
             stmt.execute();
         } catch (SQLException e) {

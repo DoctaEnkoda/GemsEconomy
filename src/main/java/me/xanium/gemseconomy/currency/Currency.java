@@ -26,6 +26,7 @@ public class Currency {
     private boolean defaultCurrency = false;
     private double defaultBalance = 0.0;
     private double exchangeRate = 0.0;
+    private String servers;
 
     public Currency(UUID uuid, String singular, String plural) {
         this.uuid = uuid;
@@ -131,6 +132,14 @@ public class Currency {
 
     public void setExchangeRate(double exchangeRate) {
         this.exchangeRate = exchangeRate;
+    }
+
+    public String getServers() {
+        return servers;
+    }
+
+    public void setServers(String servers) {
+        this.servers = servers;
     }
 }
 

@@ -43,6 +43,7 @@ public class Configuration {
         config.addDefault("debug", false);
         config.addDefault("vault", false);
         config.addDefault("transaction_log", true);
+        config.addDefault("server", "minecraft");
 
         config.addDefault("mysql.database", "minecraft");
         config.addDefault("mysql.tableprefix", "gemseconomy");
